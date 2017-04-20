@@ -1,0 +1,7 @@
+#
+# This file managed by salt. Local changes will be overwritten
+#
+
+{% for k, v in envs.iteritems() %}
+{{ k }}={{ v }}
+{%- endfor %}
