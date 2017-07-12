@@ -1,6 +1,7 @@
 {% from 'lib/auth_keys.sls' import manage_authorized_keys %}
 {% from 'lib/environment.sls' import environment %}
 {% set capdeloy_host = salt['pillar.get']('environment:' ~ environment ~ ':capdeploy', 'None') %}
+{% set sources = 'sources-pp.rb' if salt.grains.get('org') else 'sources.rb' %}
 
 include:
   - common.packages
@@ -81,7 +82,7 @@ lagotto:
 /home/lagotto/db/seeds/sources.rb:
   file.managed:
     - template: jinja
-    - source: salt://lagotto/home/lagotto/db/seeds/sources.rb
+    - source: salt://lagotto/home/lagotto/db/seeds/{{ sources }} 
     - mode: 600
     - user: lagotto
     - group: lagotto
