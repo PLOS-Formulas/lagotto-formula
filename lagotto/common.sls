@@ -5,7 +5,6 @@
 include:
   - common.packages
   - common.repos
-  - lagotto.hosts
 
 {% set ruby_ver = pillar['lagotto']['versions']['ruby'] %}
 
