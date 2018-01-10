@@ -2,6 +2,43 @@
 # This file managed by salt. Local changes will be overwritten
 #
 
-{% for k, v in envs.iteritems() %}
-{{ k }}={{ v }}
-{%- endfor %}
+{% from "lagotto/map.jinja" import props with context %}
+{% from 'lib/environment.sls' import environment %}
+
+COUCHDB_URL=http://{{ salt['pillar.get']('environment:' ~ environment ~ ':lagotto:couchdb_master', '127.0.0.1') }}:5984
+
+DB_HOST={{ props.get('mysql_server') }}
+MEMCACHE_SERVERS={{ props.get('memcache_server') }}
+REDIS_URL=redis://{{ props.get('redis_server') }}:6379/12
+
+# secret data
+API_KEY={{ pillar['secrets']['lagotto']['rails-api-key'] }}
+DB_PASSWORD={{ pillar['secrets']['lagotto']['mysql']['password'] }}
+SECRET_KEY_BASE={{ pillar['secrets']['lagotto']['rails-secret'] }}
+
+# static data (environment specific)
+ADMIN_EMAIL={{ props.get('email_admin') }}
+APPLICATION={{ props.get('app_name') }}
+CAS_PREFIX={{ props.get('auth_prefix') }}
+CAS_URL={{ props.get('auth_url') }}
+CITED={{ props.get('cited_source') }}
+CONCURRENCY={{ props.get('sidekiq_concurrency') }}
+CREATOR={{ props.get('report_creator') }}
+DB_NAME={{ props.get('mysql_name') }}
+DB_PORT={{ props.get('mysql_port') }}
+DB_USERNAME={{ props.get('mysql_username') }}
+DEPLOY_GROUP={{ props.get('deploy_group') }}
+DEPLOY_USER={{ props.get('deploy_user') }}
+GITHUB_URL={{ props.get('github_url') }}
+IMPORT={{ props.get('import_source','') }}
+LOG_LEVEL={{ props.get('log_level') }}
+MAIL_ADDRESS={{ props.get('email_address') }}
+MAIL_DOMAIN={{ props.get('email_domain') }}
+MAIL_PORT={{ props.get('email_port') }}
+OMNIAUTH={{ props.get('auth_provider') }}
+RAILS_ENV={{ props.get('rails_env') }}
+SITENAME={{ props.get('site_short_name') }}
+SITENAMELONG={{ props.get('site_long_name') }}
+SKIP_EMBER=1
+SOLR_URL={{ props.get('solr_url') }}
+STAGE={{ props.get('deploy_stage') }}
