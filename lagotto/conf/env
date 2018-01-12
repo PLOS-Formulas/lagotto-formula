@@ -5,16 +5,16 @@
 {% from "lagotto/map.jinja" import props with context %}
 {% from 'lib/environment.sls' import environment %}
 
-COUCHDB_URL=http://{{ salt['pillar.get']('environment:' ~ environment ~ ':lagotto:couchdb_master', '127.0.0.1') }}:5984
+COUCHDB_URL=http://{{ salt.pillar.get('environment:' ~ environment ~ ':lagotto:couchdb_master', '127.0.0.1') }}:5984
 
 DB_HOST={{ props.get('mysql_server') }}
 MEMCACHE_SERVERS={{ props.get('memcache_server') }}
 REDIS_URL=redis://{{ props.get('redis_server') }}:6379/12
 
 # secret data
-API_KEY={{ pillar['secrets']['lagotto']['rails-api-key'] }}
-DB_PASSWORD={{ pillar['secrets']['lagotto']['mysql']['password'] }}
-SECRET_KEY_BASE={{ pillar['secrets']['lagotto']['rails-secret'] }}
+API_KEY={{ salt.pillar.get('secrets:lagotto:rails-api-key') }}
+DB_PASSWORD={{ salt.pillar.get('secrets:lagotto:mysql:password') }}
+SECRET_KEY_BASE={{ salt.pillar.get('secrets:lagotto:rails-secret') }}
 
 # static data (environment specific)
 ADMIN_EMAIL={{ props.get('email_admin') }}
