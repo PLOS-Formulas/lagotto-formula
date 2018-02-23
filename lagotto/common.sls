@@ -1,12 +1,15 @@
 {% from 'lib/auth_keys.sls' import manage_authorized_keys %}
 {% from 'lib/environment.sls' import environment %}
+
+{% from "lagotto/map.jinja" import props with context %}
+
 {% set capdeloy_host = salt['pillar.get']('environment:' ~ environment ~ ':capdeploy', 'None') %}
 
 include:
   - common.packages
   - common.repos
 
-{% set ruby_ver = pillar['lagotto']['versions']['ruby'] %}
+{% set ruby_ver = props.get('version_ruby') %}
 
 lagotto-chruby:
   pkg:
@@ -33,11 +36,11 @@ lagotto-install-bundler:
 lagotto:
     group:
       - present
-      - gid: {{ pillar['uids']['lagotto']['gid'] }}
+      - gid: {{ salt.pillar.get('uids:lagotto:gid') }}
     user:
       - present
-      - uid: {{ pillar['uids']['lagotto']['uid'] }}
-      - gid: {{ pillar['uids']['lagotto']['gid'] }}
+      - uid: {{ salt.pillar.get('uids:lagotto:uid') }}
+      - gid: {{ salt.pillar.get('uids:lagotto:gid') }}
       - gid_from_name: true
 {% if grains['fqdn'] == capdeloy_host %}
       - groups:

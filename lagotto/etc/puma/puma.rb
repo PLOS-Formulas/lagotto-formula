@@ -1,30 +1,32 @@
 ##!/usr/bin/env puma
 
+{% from "lagotto/map.jinja" import props with context %}
+
 # Lock thread usage to a constant value.
-thread_count = {{ pillar['lagotto']['puma']['threads'] }}
+thread_count = {{ props.get('puma_threads') }}
 threads thread_count, thread_count
 
-environment "{{ pillar['lagotto']['rails_env'] }}"
+environment "{{ props.get('rails_env') }}"
 
 prune_bundler
 
 preload_app!
 
-rackup "{{ pillar['lagotto']['deploy']['app_root'] }}/current/config.ru"
+rackup "{{ props.get('app_root') }}/current/config.ru"
 
-pidfile "{{ pillar['lagotto']['deploy']['app_root'] }}/shared/tmp/pids/puma.pid"
+pidfile "{{ props.get('app_root') }}/shared/tmp/pids/puma.pid"
 
-state_path "{{ pillar['lagotto']['deploy']['app_root'] }}/shared/tmp/pids/puma.state"
+state_path "{{ props.get('app_root') }}/shared/tmp/pids/puma.state"
 
-stdout_redirect "{{ pillar['lagotto']['deploy']['app_root'] }}/shared/log/lagotto_access.log",
-                "{{ pillar['lagotto']['deploy']['app_root'] }}/shared/log/lagotto_error.log",
+stdout_redirect "{{ props.get('app_root') }}/shared/log/lagotto_access.log",
+                "{{ props.get('app_root') }}/shared/log/lagotto_error.log",
                 true
 
-bind "unix://{{ pillar['lagotto']['deploy']['app_root'] }}/shared/tmp/sockets/puma.sock"
+bind "unix://{{ props.get('app_root') }}/shared/tmp/sockets/puma.sock"
 
-workers {{ pillar['lagotto']['puma']['workers'] }}
+workers {{ props.get('puma_workers') }}
 
 on_restart do
   puts 'Refreshing Gemfile'
-  ENV["BUNDLE_GEMFILE"] = "{{ pillar['lagotto']['deploy']['app_root'] }}/current/Gemfile"
+  ENV["BUNDLE_GEMFILE"] = "{{ props.get('app_root') }}/current/Gemfile"
 end
