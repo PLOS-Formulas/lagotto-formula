@@ -1,5 +1,6 @@
 # This file is managed by SALT. *Do Not Modify*
 {% from 'lib/environment.sls' import environment %}
+{% from 'lagotto/map.jinja' import props with context %}
 
 {% set couch_host     = salt['pillar.get']('environment:' ~ environment ~ ':lagotto:couchdb_master', '127.0.0.1') %}
 {% set couch_base_url = 'http://' ~ couch_host ~ ':5984' %}
@@ -26,9 +27,9 @@ recommended = Group.where(name: 'recommended').first_or_create(title: 'Recommend
 #
 # SOURCES
 #
-Source.delete_all   # clean-slate 
+Source.delete_all   # clean-slate
 
-# CiteULike 
+# CiteULike
 citeulike_cfg = OpenStruct.new
 citeulike_cfg['url'] = 'http://{{ camoflauge }}/citeulike/api/posts/for/doi/%{doi}'
 citeulike_cfg['job_batch_size']                 = 200
@@ -61,7 +62,7 @@ citeulike = Citeulike.where(name: 'citeulike').first_or_create(
   :queueable   => 1,
   :eventable   => 1)
 
-# CrossRef 
+# CrossRef
 crossref_cfg = OpenStruct.new
 crossref_cfg['username'] = 'plos'
 crossref_cfg['password'] = 'plos1'
@@ -291,7 +292,7 @@ facebook_cfg['workers']                        = 50
 facebook_cfg['count_limit']                    = 20000
 facebook_cfg['priority']                       = 2
 
-facebook_cfg['linkstat_url'] = 
+facebook_cfg['linkstat_url'] =
     "https://{{ camoflauge }}/facebook/fql?access_token=%{access_token}&q=select " \
     "url,share_count,like_count,comment_count,click_count,total_count from link_stat " \
     "where url='%{query_url}'"
@@ -656,7 +657,7 @@ plos_comments = PlosComments.where(name: 'plos_comments').first_or_create(
   :eventable   => 1)
 
 #
-# PUBLISHER_OPTIONS 
+# PUBLISHER_OPTIONS
 #
 crossref_po_cfg = OpenStruct.new
 crossref_po_cfg['username'] = 'plos'

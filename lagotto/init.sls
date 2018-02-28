@@ -1,5 +1,7 @@
 {% from 'lib/environment.sls' import environment %}
-{% set sidekiq_server = salt['pillar.get']('environment:' ~ environment ~ ':lagotto:sidekiq_server', 'None') %}
+{% from "lagotto/map.jinja" import props with context %}
+
+{% set sidekiq_server = props.get('sidekiq_server', 'None') %}
 
 include:
   - nginx
@@ -9,11 +11,11 @@ include:
   - lagotto.sidekiq
 {% endif %}
 
-{% set app_root = pillar['lagotto']['deploy']['app_root'] %}
-{% set ruby_ver = pillar['lagotto']['versions']['ruby'] %}
-{% set ip_local_port_range = pillar['lagotto']['sysctl']['ip_local_port_range'] %}
-{% set tcp_tw_recycle = pillar['lagotto']['sysctl']['tcp_tw_recycle'] %}
-{% set tcp_tw_reuse = pillar['lagotto']['sysctl']['tcp_tw_reuse'] %}
+{% set app_root = props.get('app_root') %}
+{% set ruby_ver = props.get('versions_ruby') %}
+{% set ip_local_port_range = props.get('sysctl_ip_local_port_range') %}
+{% set tcp_tw_recycle = props.get('sysctl_tcp_tw_recycle') %}
+{% set tcp_tw_reuse = props.get('sysctl_tcp_tw_reuse') %}
 
 extend:
   apt-repo-plos:
@@ -100,4 +102,4 @@ lagotto-sysctl-tcp-tw-reuse:
     - target: /opt/rubies/ruby-{{ ruby_ver }}/bin/rake
     - force: True
     - require:
-      - pkg: plos-ruby 
+      - pkg: plos-ruby
