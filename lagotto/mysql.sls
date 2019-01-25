@@ -2,9 +2,7 @@ include:
   - percona.common
   - common.repos
 
-{% from 'lib/network.sls' import bind_ip0 with context %}
-
-{% set mysql_ip = bind_ip0().rsplit('.', 1)[0] + '.%' %}
+{% set mysql_ip = salt.plosutil.get_canonical_ip().rsplit('.', 1)[0] + '.%' %}
 
 lagotto_db:
   mysql_database.present:
