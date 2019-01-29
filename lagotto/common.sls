@@ -26,8 +26,7 @@ lagotto-install-bundler:
     - name: chruby-exec {{ ruby_ver }} -- gem install bundler
     - unless: chruby-exec {{ ruby_ver }} -- gem list | grep bundler > /dev/null 2>&1
     - cwd: /home/lagotto
-    - user: lagotto
-    - group: lagotto
+    - runas: lagotto
     - require:
       - user: lagotto
       - pkg: chruby
