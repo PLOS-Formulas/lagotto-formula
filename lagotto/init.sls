@@ -2,7 +2,7 @@
 {% from "lagotto/map.jinja" import props with context %}
 
 {% set sidekiq_server = props.get('sidekiq_server', 'None') %}
-{% set distro = salt.grains.get('oscodename') %}
+{% set oscodename = salt.grains.get('oscodename') %}
 
 include:
   - nginx
@@ -29,7 +29,7 @@ lagotto-service:
     - name: lagotto
     - enable: true
     - require:
-      {%- if distro == 'trusty' %}
+      {%- if oscodename == 'trusty' %}
       - file: /etc/init/lagotto.conf
       {%- else %}
       - file: /etc/systemd/system/lagotto.service
@@ -45,7 +45,7 @@ lagotto-apt-packages:
         - libmysqlclient-dev
         - libssl-dev
         - nodejs
-        {% if distro == 'bionic' %}
+        {% if oscodename == 'bionic' %}
         - node-gyp
         - nodejs-dev
         - libssl1.0-dev
@@ -73,7 +73,7 @@ lagotto-apt-packages:
     - require:
       - file: {{ app_root }}/shared
 
-{%- if distro == 'trusty' %}
+{%- if oscodename == 'trusty' %}
 /etc/init/lagotto.conf:
   file.managed:
     - template: jinja
@@ -103,10 +103,12 @@ lagotto-sysctl-ip-local-port-range:
     - name: net.ipv4.ip_local_port_range
     - value: {{ ip_local_port_range }}
 
+{%- if oscodename == 'trusty' %}
 lagotto-sysctl-tcp-tw-recycle:
   sysctl.present:
     - name: net.ipv4.tcp_tw_recycle
     - value: {{ tcp_tw_recycle }}
+{%- endif %}
 
 lagotto-sysctl-tcp-tw-reuse:
   sysctl.present:
