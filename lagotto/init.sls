@@ -45,6 +45,12 @@ lagotto-apt-packages:
         - libmysqlclient-dev
         - libssl-dev
         - nodejs
+        {% if distro == 'bionic' %}
+        - node-gyp
+        - nodejs-dev
+        - libssl1.0-dev
+        - npm
+        {% endif %}
 
 {{ app_root }}:
   file.directory:
