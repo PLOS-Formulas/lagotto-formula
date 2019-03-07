@@ -2,12 +2,16 @@
 #
 # CouchDB only supports binding to single or all interfaces (ie, not selective)
 # https://issues.apache.org/jira/browse/COUCHDB-907
-
+{% if salt.grains.get('oscodename') == 'trusty' %}
+  {% set couchdb_ini = '/etc/couchdb/default.ini' %}
+{% else %}
+  {% set couchdb_ini = '/opt/couchdb/etc/local.ini' %}
+{% endif %}
 include:
   - couchdb 
 
 extend:
-  /etc/couchdb/default.ini:
+  {{ couchdb_ini }}:
     file:
       - context:
         b_address: 0.0.0.0 
