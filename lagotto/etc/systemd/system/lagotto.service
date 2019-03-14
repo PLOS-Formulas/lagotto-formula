@@ -1,5 +1,6 @@
 {% from "lagotto/map.jinja" import props with context -%}
 {% set alm_root = props.get('app_root') -%}
+{% set version_ruby = props.get('version_ruby') -%}
 [Unit]
 Description=Lagotto
 Requires=network.target
@@ -12,7 +13,7 @@ User=lagotto
 Group=lagotto
 ConditionPathIsDirectory={{ alm_root }}/current
 WorkingDirectory={{ alm_root }}/current
-ExecStart=/bin/bash -lc 'chruby-exec 2.2.2 -- bundle exec puma -i 0 -C $ALM_ROOT/shared/puma.rb'
+ExecStart=/bin/bash -lc 'chruby-exec {{ version_ruby }} -- bundle exec puma -C $ALM_ROOT/shared/puma.rb'
 
 [Install]
 WantedBy=multi-user.target

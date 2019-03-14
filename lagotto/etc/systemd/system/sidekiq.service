@@ -1,6 +1,7 @@
 {% from "lagotto/map.jinja" import props with context -%}
 {% set alm_root = props.get('app_root') -%}
 {% set rails_env = props.get('rails_env') -%}
+{% set version_ruby = props.get('version_ruby') -%}
 [Unit]
 Description=Lagotto sidekiq
 Requires=network.target
@@ -13,7 +14,7 @@ User=lagotto
 Group=lagotto
 ConditionPathIsDirectory={{ alm_root }}/current
 WorkingDirectory={{ alm_root }}/current
-ExecStart=/bin/bash -lc 'chruby-exec 2.2.2 -- bundle exec sidekiq -i 0 -e {{ rails_env }}'
+ExecStart=/bin/bash -lc 'chruby-exec {{ version_ruby }} -- bundle exec sidekiq -e {{ rails_env }}'
 
 [Install]
 WantedBy=multi-user.target
