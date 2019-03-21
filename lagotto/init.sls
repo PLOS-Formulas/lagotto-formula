@@ -2,6 +2,7 @@
 {% from "lagotto/map.jinja" import props with context %}
 
 {% set sidekiq_server = props.get('sidekiq_server', 'None') %}
+{% set oscodename = salt.grains.get('oscodename') %}
 
 include:
   - nginx
@@ -12,7 +13,7 @@ include:
 {% endif %}
 
 {% set app_root = props.get('app_root') %}
-{% set ruby_ver = props.get('versions_ruby') %}
+{% set ruby_ver = props.get('version_ruby') %}
 {% set ip_local_port_range = props.get('sysctl_ip_local_port_range') %}
 {% set tcp_tw_recycle = props.get('sysctl_tcp_tw_recycle') %}
 {% set tcp_tw_reuse = props.get('sysctl_tcp_tw_reuse') %}
@@ -22,15 +23,17 @@ extend:
     pkgrepo.managed:
       - require_in:
         - pkg: lagotto-apt-packages
-        - pkg: chruby
-        - pkg: plos-ruby
 
 lagotto-service:
   service.running:
     - name: lagotto
     - enable: true
     - require:
+      {%- if oscodename == 'trusty' %}
       - file: /etc/init/lagotto.conf
+      {%- else %}
+      - file: /etc/systemd/system/lagotto.service
+      {%- endif %}
     - watch:
       - file: {{ app_root }}/shared/puma.rb
 
@@ -42,6 +45,12 @@ lagotto-apt-packages:
         - libmysqlclient-dev
         - libssl-dev
         - nodejs
+        {% if oscodename == 'bionic' %}
+        - node-gyp
+        - nodejs-dev
+        - libssl1.0-dev
+        - npm
+        {% endif %}
 
 {{ app_root }}:
   file.directory:
@@ -64,6 +73,7 @@ lagotto-apt-packages:
     - require:
       - file: {{ app_root }}/shared
 
+{%- if oscodename == 'trusty' %}
 /etc/init/lagotto.conf:
   file.managed:
     - template: jinja
@@ -71,6 +81,12 @@ lagotto-apt-packages:
     - user: root
     - group: root
     - mode: 644
+{%- else %}
+/etc/systemd/system/lagotto.service:
+  file.managed:
+    - template: jinja
+    - source: salt://lagotto/etc/systemd/system/lagotto.service
+{%- endif %}
 
 /etc/sudoers.d/lagotto:
   file.managed:
@@ -87,10 +103,12 @@ lagotto-sysctl-ip-local-port-range:
     - name: net.ipv4.ip_local_port_range
     - value: {{ ip_local_port_range }}
 
+{%- if oscodename == 'trusty' %}
 lagotto-sysctl-tcp-tw-recycle:
   sysctl.present:
     - name: net.ipv4.tcp_tw_recycle
     - value: {{ tcp_tw_recycle }}
+{%- endif %}
 
 lagotto-sysctl-tcp-tw-reuse:
   sysctl.present:
@@ -102,4 +120,4 @@ lagotto-sysctl-tcp-tw-reuse:
     - target: /opt/rubies/ruby-{{ ruby_ver }}/bin/rake
     - force: True
     - require:
-      - pkg: plos-ruby
+      - pkg: plos-ruby-{{ ruby_ver }}
