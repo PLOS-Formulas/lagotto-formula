@@ -1,5 +1,6 @@
 {% from 'lib/auth_keys.sls' import manage_authorized_keys %}
 {% from 'lib/environment.sls' import environment %}
+{% from "lib/ruby.sls" import use_ruby -%}
 
 {% from "lagotto/map.jinja" import props with context %}
 
@@ -8,30 +9,11 @@
 include:
   - common.packages
   - common.repos
+  - lib.ruby
 
 {% set ruby_ver = props.get('version_ruby') %}
 
-lagotto-chruby:
-  pkg:
-    - name: chruby
-    - installed
-
-plos-ruby:
-  pkg:
-    - name: plos-ruby-{{ ruby_ver }}
-    - installed
-
-lagotto-install-bundler:
-  cmd.run:
-    - name: chruby-exec {{ ruby_ver }} -- gem install bundler
-    - unless: chruby-exec {{ ruby_ver }} -- gem list | grep bundler > /dev/null 2>&1
-    - cwd: /home/lagotto
-    - user: lagotto
-    - group: lagotto
-    - require:
-      - user: lagotto
-      - pkg: chruby
-      - pkg: plos-ruby
+{{ use_ruby(version=ruby_ver, user='lagotto', bundler_version='1.17.3') }}
 
 lagotto:
     group:
