@@ -1,4 +1,6 @@
 {% set distro = salt.grains.get('oscodename') %}
+
+# replace with Docker
 sidekiq:
   service.running:
     - watch:

@@ -4,8 +4,6 @@
 
 {% from "lagotto/map.jinja" import props with context %}
 
-{% set capdeloy_host = salt['pillar.get']('environment:' ~ environment ~ ':capdeploy', 'None') %}
-
 include:
   - common.packages
   - common.repos
@@ -24,17 +22,11 @@ lagotto:
       - uid: {{ salt.pillar.get('uids:lagotto:uid') }}
       - gid: {{ salt.pillar.get('uids:lagotto:gid') }}
       - gid_from_name: true
-{% if grains['fqdn'] == capdeloy_host %}
-      - groups:
-        - teamcity
-{% endif %}
       - createhome: true
       - shell: /bin/bash
       - require:
         - group: lagotto
-{% if grains['fqdn'] == capdeloy_host %}
-        - group: teamcity
-{% endif %}
+
 
 
 {% if 'is_vagrant' in grains or grains['environment'] == 'dev' %}
