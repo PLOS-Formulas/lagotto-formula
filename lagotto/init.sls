@@ -62,8 +62,7 @@ extend:
       - {{ app_port }}:{{ app_port }}
     - require:
       - {{ app_name }}-image
-    - command: bundle exec puma
-    # TODO - command: bundle exec rake db:migrate && bundle exec puma
+    - command: bundle exec rake db:migrate && bundle exec puma
 
 # TODO probably remove this
 lagotto-apt-packages:
