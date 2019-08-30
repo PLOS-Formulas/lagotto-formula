@@ -53,13 +53,17 @@ extend:
   docker_container.running:
     - name: {{ app_name }}-app
     - image: {{ docker_image_name }}
-    - environment: {{ props | yaml }}
+    - environment:
+{%- for name, value in props.items() %}
+        {{ name|upper }}: {{ value }}
+{% endfor %}
     - dns: {{ docker_dns }}
     - port_bindings:
       - {{ app_port }}:{{ app_port }}
     - require:
       - {{ app_name }}-image
     - command: bundle exec puma
+    # TODO - command: bundle exec rake db:migrate && bundle exec puma
 
 # TODO probably remove this
 lagotto-apt-packages:

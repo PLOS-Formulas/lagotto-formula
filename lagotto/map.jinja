@@ -1,8 +1,5 @@
-{% if salt.grains.has_value('subconfig') %}
-  {{ salt.grains.setval('env_complete', grains.get('environment') + '_' + grains.get('subconfig')) }}
-{% else %}
-  {{ salt.grains.set('env_complete', grains.get('environment')) }}
-{% endif %}
+{% from "consul/lib.sls" import consul_service_domain %}
+{% set mysql_password = salt.pillar.get('secrets:lagotto:mysql:password') %}
 
 {% set props = salt['grains.filter_by'](
 {
@@ -22,20 +19,16 @@
     'sysctl_tcp_tw_recycle': '1',
     'sysctl_tcp_tw_reuse': '1',
 
-    'memcache_server': '127.0.0.1',
-    'mysql_server': '127.0.0.1',
-    'redis_server': '127.0.0.1',
-    'sidekiq_server': '127.0.0.1',
+    'memcache_server': consul_service_domain("alm-manager-memcache", style="soma"),
+    'database_url': "mysql2://{}:{}@{}:{}/{}?pool=5&timeout=5000&encoding=utf8mb4".format("lagotto", mysql_password, consul_service_domain("alm-manager-sql", style='soma'), 3306, "lagotto"),
+    'redis_server': consul_service_domain("alm-manager-redis", style="soma"),
+    'sidekiq_server': consul_service_domain("alm-manager-worker", style="soma"),
 
     'log_level': 'debug',
     'rails_env': 'development',
     'import_source': '',
     'cited_source': 'scopus',
     'solr_url': 'http://solr-mega-dev.soma.plos.org/solr/journals_dev/select',
-
-    'mysql_name': 'lagotto',
-    'mysql_port': '3306',
-    'mysql_username': 'lagotto',
 
     'auth_provider': 'cas',
     'auth_url': 'https://nedcas-dev.plos.org',
@@ -56,24 +49,10 @@
   },
   'vagrant': {
     'site_short_name': 'ALM (Vagrant)',
-
-    'memcache_server': 'lagotto.vagrant.local',
-    'mysql_server': 'lagotto.vagrant.local',
-    'redis_server': 'lagotto.vagrant.local',
-    'sidekiq_server': 'lagotto.vagrant.local',
   },
   'dev': {
     'log_level': 'debug',
     'site_short_name': 'ALM (DEV)',
-
-    'sidekiq_server': 'alm-dev1-backend1.soma.plos.org',
-  },
-  'qa': {
-    'log_level': 'info',
-    'site_short_name': 'ALM (QA)',
-    'auth_url': 'https://nedcas-qa.plos.org',
-
-    'sidekiq_server': 'lagotto-301.soma.plos.org',
   },
   'stage': {
     'log_level': 'warn',
@@ -83,11 +62,6 @@
     'mysql_name': 'alm',
     'mysql_username': 'alm',
     'auth_url': 'https://nedcas-stage.plos.org',
-
-    'memcache_server': 'alm-stage1-backend1.soma.plos.org',
-    'mysql_server': 'db-alm-401.soma.plos.org',
-    'redis_server': 'redis-alm-401.soma.plos.org',
-    'sidekiq_server': 'alm-stage1-backend1.soma.plos.org',
   },
   'prod': {
     'log_level': 'warn',
@@ -103,11 +77,6 @@
     'sidekiq_concurrency': '40',
     'bugsnag_key': 'd3504e878cdd6180e2af11eeb746041f',
     'bugsnag_js_key': '8ee87325d4e0c9f462212b56f994ada4',
-
-    'memcache_server': 'lagotto-101.soma.plos.org,lagotto-102.soma.plos.org',
-    'mysql_server': 'db-alm.soma.plos.org',
-    'redis_server': 'redis-alm-101.soma.plos.org',
-    'sidekiq_server': 'lagotto-101.soma.plos.org',
   }
 }
-, grain='env_complete', base='default') %}
+, grain='environment', base='default') %}
