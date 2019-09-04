@@ -22,7 +22,6 @@
     'memcache_server': consul_service_domain("alm-manager-memcache", style="soma"),
     'database_url': "mysql2://{}:{}@{}:{}/{}?pool=5&timeout=5000&encoding=utf8mb4".format("lagotto", mysql_password, consul_service_domain("alm-manager-sql", style='soma'), 3306, "lagotto"),
     'redis_server': consul_service_domain("alm-manager-redis", style="soma"),
-    'sidekiq_server': consul_service_domain("alm-manager-worker", style="soma"),
 
     'log_level': 'debug',
     'rails_env': 'development',
