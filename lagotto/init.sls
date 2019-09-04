@@ -26,8 +26,7 @@ include:
 {% set docker0 = salt.network.ip_addrs('docker0') %}
 {% set docker_dns = '172.17.0.1' if not docker0 else docker0[0] %}
 
-#{% set docker_image_name = "plos/{}:{}".format(app_name, environment) %}
-{% set docker_image_name = "plos/{}:ALM-1045-dockerize-44373c3".format(app_name) %} 
+{% set docker_image_name = "plos/{}:{}".format(props.get('docker_image_name'), props.get('docker_image_tag')) %} 
 {% set mysql_host = consul_service_domain("alm-manager-sql", style='soma') %}
 
 extend:

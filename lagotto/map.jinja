@@ -46,13 +46,17 @@
 
     'puma_threads': '16',
     'puma_workers': '3',
+    'docker_image_name': "lagotto",
+    'docker_image_tag': "latest"
   },
   'vagrant': {
     'site_short_name': 'ALM (Vagrant)',
+    'docker_image_tag': "ALM-1045-dockerize"
   },
   'dev': {
     'log_level': 'debug',
     'site_short_name': 'ALM (DEV)',
+    'docker_image_tag': "develop"
   },
   'stage': {
     'log_level': 'warn',
@@ -62,6 +66,7 @@
     'mysql_name': 'alm',
     'mysql_username': 'alm',
     'auth_url': 'https://nedcas-stage.plos.org',
+    'docker_image_tag': "stage"
   },
   'prod': {
     'log_level': 'warn',
@@ -77,6 +82,7 @@
     'sidekiq_concurrency': '40',
     'bugsnag_key': 'd3504e878cdd6180e2af11eeb746041f',
     'bugsnag_js_key': '8ee87325d4e0c9f462212b56f994ada4',
+    'docker_image_tag': "master"
   }
 }
 , grain='environment', base='default') %}
