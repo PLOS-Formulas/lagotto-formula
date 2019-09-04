@@ -9,9 +9,6 @@ include:
   - docker
   - lagotto.nginx
   - lagotto.common
-{% if grains['fqdn'] == sidekiq_server %}
-  - lagotto.sidekiq
-{% endif %}
 
 {% set environment = salt.grains.get('environment') %}
 {% set app_name = 'lagotto' %}
