@@ -1,4 +1,5 @@
 {% from "lagotto/map.jinja" import props with context %}
+{% from "consul/lib.sls" import consul_service_domain %}
 
 {% set sidekiq_server = props.get('sidekiq_server', 'None') %}
 {% set oscodename = salt.grains.get('oscodename') %}
@@ -13,6 +14,7 @@ include:
 {% endif %}
 
 {% set environment = salt.grains.get('environment') %}
+{% set app_name = 'lagotto' %}
 {% set app_port = props.get('app_port') %}
 {% set app_root = props.get('app_root') %}
 {% set ruby_ver = props.get('version_ruby') %}
@@ -25,7 +27,8 @@ include:
 {% set docker_dns = '172.17.0.1' if not docker0 else docker0[0] %}
 
 #{% set docker_image_name = "plos/{}:{}".format(app_name, environment) %}
-{% set docker_image_name = "plos/{}:ALM-1045-dockerize-e9425cf".format(app_name) %}
+{% set docker_image_name = "plos/{}:ALM-1045-dockerize-44373c3".format(app_name) %} 
+{% set mysql_host = consul_service_domain("alm-manager-sql", style='soma') %}
 
 extend:
   apt-repo-plos:
@@ -49,7 +52,7 @@ extend:
       - {{app_name}}-app
       #- {{app_name}}-worker
 
-{{ app_name }}-container-running:
+{{ app_name }}-app-container-running:
   docker_container.running:
     - name: {{ app_name }}-app
     - image: {{ docker_image_name }}
@@ -62,7 +65,7 @@ extend:
       - {{ app_port }}:{{ app_port }}
     - require:
       - {{ app_name }}-image
-    - command: bundle exec rake db:migrate && bundle exec puma
+    - command: docker/start.sh {{ mysql_host }}:3306
 
 # TODO probably remove this
 lagotto-apt-packages:
