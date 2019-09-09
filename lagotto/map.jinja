@@ -24,7 +24,7 @@
     'redis_server': consul_service_domain("alm-manager-redis", style="soma"),
 
     'log_level': 'debug',
-    'rails_env': 'development',
+    'rails_env': 'production',
     'import_source': '',
     'cited_source': 'scopus',
     'solr_url': 'http://solr-mega-dev.soma.plos.org/solr/journals_dev/select',
@@ -59,7 +59,6 @@
   },
   'stage': {
     'log_level': 'warn',
-    'rails_env': 'production',
     'import_source': 'plos',
     'site_short_name': 'ALM (STAGE)',
     'mysql_name': 'alm',
@@ -69,7 +68,6 @@
   },
   'prod': {
     'log_level': 'warn',
-    'rails_env': 'production',
     'import_source': 'plos',
     'solr_url': 'http://solr-mega-prod.soma.plos.org/solr/journals_prod/select',
     'mysql_name': 'alm',
