@@ -8,7 +8,7 @@ include:
 
 {{ consul_service_definition("alm-manager-sql", port=3306, cluster="alm") }}
 
-{% set docker_ip = '172.17.0.0/255.255.0.0' %}
+{% set docker_ip = '172.16.0.0/255.240.0.0' %}
 
 lagotto_db:
   mysql_database.present:
