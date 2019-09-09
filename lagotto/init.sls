@@ -5,7 +5,6 @@
 {% set oscodename = salt.grains.get('oscodename') %}
 
 include:
-  - nginx
   - docker
   - lagotto.nginx
   - lagotto.common
@@ -46,7 +45,11 @@ extend:
     - force: True
     - names:
       - {{app_name}}-app
-      #- {{app_name}}-worker
+      - {{app_name}}-worker
+
+{{ app_name }}-network:
+  docker_network.present:
+    - name: {{ app_name }}
 
 {{ app_name }}-app-container-running:
   docker_container.running:
@@ -59,9 +62,28 @@ extend:
     - dns: {{ docker_dns }}
     - port_bindings:
       - {{ app_port }}:{{ app_port }}
+    - binds:
+      - {{ app_name }}-railsassets:/code/public
+    - networks:
+      - {{ app_name }}
     - require:
       - {{ app_name }}-image
+      - {{ app_name }}-network
+      - {{ app_name }}-assets-volume
     - command: docker/start.sh {{ mysql_host }}:3306
+
+{{ app_name }}-assets-volume-absent:
+  docker_volume.absent:
+    - onchanges:
+      - {{ app_name }}-image
+    - require:
+      - {{ app_name}}-containers-absent
+    - name: {{ app_name }}-railsassets
+
+{{ app_name }}-assets-volume:
+  docker_volume.present:
+    - name: {{ app_name }}-railsassets
+
 
 # TODO probably remove this
 lagotto-apt-packages:
@@ -78,27 +100,6 @@ lagotto-apt-packages:
         - libssl1.0-dev
         - npm
         {% endif %}
-
-{{ app_root }}:
-  file.directory:
-    - user: lagotto
-    - group: lagotto
-    - require:
-      - user: lagotto
-
-{{ app_root }}/shared:
-  file.directory:
-    - user: lagotto
-    - group: lagotto
-    - require:
-      - file: {{ app_root }}
-
-{{ app_root }}/shared/puma.rb:
-  file.managed:
-    - template: jinja
-    - source: salt://lagotto/etc/puma/puma.rb
-    - require:
-      - file: {{ app_root }}/shared
 
 {%- if oscodename == 'trusty' %}
 /etc/init/lagotto.conf:
