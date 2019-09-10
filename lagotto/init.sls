@@ -12,8 +12,6 @@ include:
 {% set environment = salt.grains.get('environment') %}
 {% set app_name = 'lagotto' %}
 {% set app_port = props.get('app_port') %}
-{% set app_root = props.get('app_root') %}
-{% set ruby_ver = props.get('version_ruby') %}
 {% set ip_local_port_range = props.get('sysctl_ip_local_port_range') %}
 {% set tcp_tw_recycle = props.get('sysctl_tcp_tw_recycle') %}
 {% set tcp_tw_reuse = props.get('sysctl_tcp_tw_reuse') %}
@@ -24,12 +22,6 @@ include:
 
 {% set docker_image_name = "plos/{}:{}".format(props.get('docker_image_name'), props.get('docker_image_tag')) %} 
 {% set mysql_host = consul_service_domain("alm-manager-sql", style='soma') %}
-
-extend:
-  apt-repo-plos:
-    pkgrepo.managed:
-      - require_in:
-        - pkg: lagotto-apt-packages
 
 {{ app_name }}-image:
   docker_image.present:
@@ -84,68 +76,12 @@ extend:
   docker_volume.present:
     - name: {{ app_name }}-railsassets
 
-
-# TODO probably remove this
-lagotto-apt-packages:
-  pkg.installed:
-    - pkgs:
-        - build-essential
-        - libgmp-dev
-        - libmysqlclient-dev
-        - libssl-dev
-        - nodejs
-        {% if oscodename == 'bionic' %}
-        - node-gyp
-        - nodejs-dev
-        - libssl1.0-dev
-        - npm
-        {% endif %}
-
-{%- if oscodename == 'trusty' %}
-/etc/init/lagotto.conf:
-  file.managed:
-    - template: jinja
-    - source: salt://lagotto/etc/init/lagotto.conf
-    - user: root
-    - group: root
-    - mode: 644
-{%- else %}
-/etc/systemd/system/lagotto.service:
-  file.managed:
-    - template: jinja
-    - source: salt://lagotto/etc/systemd/system/lagotto.service
-{%- endif %}
-
-/etc/sudoers.d/lagotto:
-  file.managed:
-    - template: jinja
-    - source: salt://lagotto/etc/sudoers.d/lagotto
-
-/etc/logrotate.d/rails:
-  file.managed:
-    - template: jinja
-    - source: salt://lagotto/etc/logrotate.d/rails
-
 lagotto-sysctl-ip-local-port-range:
   sysctl.present:
     - name: net.ipv4.ip_local_port_range
     - value: {{ ip_local_port_range }}
 
-{%- if oscodename == 'trusty' %}
-lagotto-sysctl-tcp-tw-recycle:
-  sysctl.present:
-    - name: net.ipv4.tcp_tw_recycle
-    - value: {{ tcp_tw_recycle }}
-{%- endif %}
-
 lagotto-sysctl-tcp-tw-reuse:
   sysctl.present:
     - name: net.ipv4.tcp_tw_reuse
     - value: {{ tcp_tw_reuse }}
-
-/usr/local/bin/rake:
-  file.symlink:
-    - target: /opt/rubies/ruby-{{ ruby_ver }}/bin/rake
-    - force: True
-    - require:
-      - pkg: plos-ruby-{{ ruby_ver }}
