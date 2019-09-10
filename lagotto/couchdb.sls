@@ -2,11 +2,7 @@
 #
 # CouchDB only supports binding to single or all interfaces (ie, not selective)
 # https://github.com/apache/couchdb/issues/1589
-{% if salt.grains.get('oscodename') == 'trusty' %}
-  {% set couchdb_ini = '/etc/couchdb/default.ini' %}
-{% else %}
-  {% set couchdb_ini = '/opt/couchdb/etc/local.ini' %}
-{% endif %}
+{% set couchdb_ini = '/opt/couchdb/etc/local.ini' %}
 include:
   - couchdb 
 
