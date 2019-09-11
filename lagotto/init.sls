@@ -5,9 +5,9 @@
 {% set oscodename = salt.grains.get('oscodename') %}
 
 include:
-  - docker
   - lagotto.nginx
   - lagotto.common
+  - lagotto.lib.docker-common
 
 {% set environment = salt.grains.get('environment') %}
 {% set app_name = 'lagotto' %}
@@ -16,28 +16,19 @@ include:
 {% set tcp_tw_recycle = props.get('sysctl_tcp_tw_recycle') %}
 {% set tcp_tw_reuse = props.get('sysctl_tcp_tw_reuse') %}
 {% set app_name = 'lagotto' %}
+{% set mysql_host = consul_service_domain("alm-manager-sql", style='soma') %}
 
 {% set docker0 = salt.network.ip_addrs('docker0') %}
 {% set docker_dns = '172.17.0.1' if not docker0 else docker0[0] %}
+{% set docker_image_name = "plos/{}:{}".format(props.get('docker_image_name'), props.get('docker_image_tag')) %}
 
-{% set docker_image_name = "plos/{}:{}".format(props.get('docker_image_name'), props.get('docker_image_tag')) %} 
-{% set mysql_host = consul_service_domain("alm-manager-sql", style='soma') %}
-
-{{ app_name }}-image:
-  docker_image.present:
-    - name: {{ docker_image_name }}
-    - force: true
-    - require:
-      - pkg: docker
-
-{{ app_name }}-containers-absent:
+{{ app_name }}-app-container-absent:
   docker_container.absent:
     - onchanges:
       - {{ app_name }}-image
     - force: True
     - names:
       - {{app_name}}-app
-      - {{app_name}}-worker
 
 {{ app_name }}-network:
   docker_network.present:
@@ -69,7 +60,7 @@ include:
     - onchanges:
       - {{ app_name }}-image
     - require:
-      - {{ app_name}}-containers-absent
+      - {{ app_name}}-app-container-absent
     - name: {{ app_name }}-railsassets
 
 {{ app_name }}-assets-volume:
