@@ -60,7 +60,8 @@ include:
     - onchanges:
       - {{ app_name }}-image
     - require:
-      - {{ app_name}}-app-container-absent
+      - {{ app_name }}-app-container-absent
+      - {{ app_name }}-web-container-absent
     - name: {{ app_name }}-railsassets
     - onlyif:
       - docker inspect {{ app_name }}-railsassets > /dev/null
