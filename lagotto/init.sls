@@ -1,5 +1,5 @@
 {% from "lagotto/map.jinja" import props with context %}
-{% from "consul/lib.sls" import consul_service_domain %}
+{% from "consul/lib.sls" import consul_service_domain, consul_service_definition %}
 
 {% set sidekiq_server = props.get('sidekiq_server', 'None') %}
 {% set oscodename = salt.grains.get('oscodename') %}
@@ -62,11 +62,19 @@ include:
     - require:
       - {{ app_name}}-app-container-absent
     - name: {{ app_name }}-railsassets
+    - onlyif:
+      - docker inspect {{ app_name }}-railsassets > /dev/null
 
 {{ app_name }}-assets-volume:
   docker_volume.present:
     - name: {{ app_name }}-railsassets
 
+{{ consul_service_definition("alm-manager-app", 
+                             port=app_port, 
+                             health_check_http_path="/",
+                             cluster="alm") }}
+
+# TODO this stuff can probably go?
 lagotto-sysctl-ip-local-port-range:
   sysctl.present:
     - name: net.ipv4.ip_local_port_range
