@@ -1,3 +1,4 @@
+{% from "consul/lib.sls" import consul_service_definition %}
 {% from "lagotto/map.jinja" import props with context %}
 {% set app_name = 'lagotto' %} 
 {% set app_port = props.get('app_port') %}
@@ -41,3 +42,8 @@ stop-nginx:
       - {{ app_name }}-network
       - {{ app_name }}-assets-volume
       - stop-nginx
+
+{{ consul_service_definition("alm-manager-web", 
+                             port=80,  
+                             health_check_http_path="/", 
+                             cluster="alm") }}
