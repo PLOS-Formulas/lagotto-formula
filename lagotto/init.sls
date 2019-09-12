@@ -73,14 +73,3 @@ include:
                              port=app_port, 
                              health_check_http_path="/",
                              cluster="alm") }}
-
-# TODO this stuff can probably go?
-lagotto-sysctl-ip-local-port-range:
-  sysctl.present:
-    - name: net.ipv4.ip_local_port_range
-    - value: {{ ip_local_port_range }}
-
-lagotto-sysctl-tcp-tw-reuse:
-  sysctl.present:
-    - name: net.ipv4.tcp_tw_reuse
-    - value: {{ tcp_tw_reuse }}
