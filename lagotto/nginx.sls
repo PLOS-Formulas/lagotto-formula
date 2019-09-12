@@ -25,6 +25,14 @@ stop-nginx:
         app_domain: {{ app_name }}-app
         app_port: {{ app_port }}
 
+{{ app_name }}-web-container-absent:
+  docker_container.absent:
+    - onchanges:
+      - {{ app_name }}-image
+    - force: True
+    - names:
+      - {{app_name}}-web
+
 {{ app_name }}-web-container-running:
   docker_container.running:
     - name: {{ app_name }}-web
