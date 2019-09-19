@@ -1,9 +1,8 @@
 {% from "consul/lib.sls" import consul_service_definition %}
 {% from "lagotto/map.jinja" import props with context %}
-{% set app_name = 'lagotto' %} 
+{% from "lagotto/lib/docker-common.sls" import app_name, docker_dns %}
+
 {% set app_port = props.get('app_port') %}
-{% set docker0 = salt.network.ip_addrs('docker0') %}
-{% set docker_dns = '172.17.0.1' if not docker0 else docker0[0] %}
 
 # nginx is now run in a container instead of on the host
 remove-nginx:
