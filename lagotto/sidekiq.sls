@@ -1,9 +1,5 @@
 {% from "lagotto/map.jinja" import props with context %}
-
-{% set app_name = 'lagotto' %}
-{% set docker0 = salt.network.ip_addrs('docker0') %}
-{% set docker_dns = '172.17.0.1' if not docker0 else docker0[0] %}
-{% set docker_image_name = "plos/{}:{}".format(props.get('docker_image_name'), props.get('docker_image_tag')) %}
+{% from "lagotto/lib/docker-common.sls" import app_name, docker_dns, docker_image_name %}
 
 include:
   - lagotto.lib.docker-common
