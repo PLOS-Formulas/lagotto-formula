@@ -1,5 +1,7 @@
 {% from "lagotto/map.jinja" import props with context %}
 {% from "consul/lib.sls" import consul_service_domain, consul_service_definition %}
+{% from "lagotto/lib/docker-common.sls" import app_name, docker_dns, docker_image_name %}
+
 
 {% set sidekiq_server = props.get('sidekiq_server', 'None') %}
 {% set oscodename = salt.grains.get('oscodename') %}
@@ -10,17 +12,8 @@ include:
   - lagotto.lib.docker-common
 
 {% set environment = salt.grains.get('environment') %}
-{% set app_name = 'lagotto' %}
 {% set app_port = props.get('app_port') %}
-{% set ip_local_port_range = props.get('sysctl_ip_local_port_range') %}
-{% set tcp_tw_recycle = props.get('sysctl_tcp_tw_recycle') %}
-{% set tcp_tw_reuse = props.get('sysctl_tcp_tw_reuse') %}
-{% set app_name = 'lagotto' %}
 {% set mysql_host = consul_service_domain("alm-manager-sql", style='soma') %}
-
-{% set docker0 = salt.network.ip_addrs('docker0') %}
-{% set docker_dns = '172.17.0.1' if not docker0 else docker0[0] %}
-{% set docker_image_name = "plos/{}:{}".format(props.get('docker_image_name'), props.get('docker_image_tag')) %}
 
 {{ app_name }}-app-container-absent:
   docker_container.absent:
