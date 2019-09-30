@@ -46,11 +46,11 @@
     'version_ruby': '2.2.2',
   },
   'vagrant': {
-    'docker_image_tag': "develop",
+    'docker_image_tag': "dev",
     'sitename': 'ALM (Vagrant)',
   },
   'dev': {
-    'docker_image_tag': "develop",
+    'docker_image_tag': "dev",
     'log_level': 'debug',
     'sitename': 'ALM (DEV)',
   },
@@ -71,7 +71,7 @@
     'cas_url': 'https://register.plos.org',
     'concurrency': '40',
     'database_url': "mysql2://{}:{}@{}:{}/{}?pool=5&timeout=5000&encoding=utf8mb4".format("alm", mysql_password, mysql_host, 3306, "alm"),
-    'docker_image_tag': "master",
+    'docker_image_tag': "prod",
     'import': 'plos',
     'log_level': 'warn',
     'mail_address': 'plos-org.mail.protection.outlook.com',
