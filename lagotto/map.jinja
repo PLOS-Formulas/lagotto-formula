@@ -13,6 +13,8 @@
     'app_port': 9292,
     'app_root': '/var/www/lagotto',
     'application': "lagotto",
+    'bugsnag_hostname': salt.grains.get('fqdn'),
+    'bugsnag_release_stage': environment,
     'cas_prefix': '/cas',
     'cas_url': 'https://nedcas-dev.plos.org',
     'cited': 'scopus',
