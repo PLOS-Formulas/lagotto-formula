@@ -40,12 +40,14 @@ include:
       - {{ app_port }}:{{ app_port }}
     - binds:
       - {{ app_name }}-railsassets:/code/public
+      - /code/config/subscribers.yml:/code/config/subscribers.yml
     - networks:
       - {{ app_name }}
     - require:
       - {{ app_name }}-image
       - {{ app_name }}-network
       - {{ app_name }}-assets-volume
+      - {{ app_name }}-subscribers-config-file
     - command: docker/start.sh {{ mysql_host }}:3306
 
 {{ app_name }}-assets-volume-absent:
@@ -62,6 +64,12 @@ include:
 {{ app_name }}-assets-volume:
   docker_volume.present:
     - name: {{ app_name }}-railsassets
+
+{{ app_name }}-subscribers-config-file:
+  file.managed:
+    - name: /code/config/subscribers.yml
+    - source: salt://lagotto/conf/code/config/subscribers.yml
+    - template: jinja
 
 {{ consul_service_definition("alm-manager-app", 
                              port=app_port, 

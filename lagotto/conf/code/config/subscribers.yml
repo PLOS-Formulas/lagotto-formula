@@ -1,0 +1,17 @@
+{% set environment = grains['environment'] %}
+---
+# A request will be made to the subscriber url
+# when a milestone has been passed for the specified source
+# and the article is for the specified journal
+#
+# :subscribers:
+# - :journal: pbio
+#   :source: crossref
+#   :milestones: [1, 15]
+#   :url: 'http://example.com'
+{%if environment == 'prod' %}
+:subscribers: []
+{% else %}
+:subscribers: []
+{% endif %}
+...
