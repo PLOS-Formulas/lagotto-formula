@@ -24,3 +24,10 @@ include:
     - require:
       - {{ app_name }}-image
     - command: bundle exec sidekiq
+
+/etc/cron.d/{{ app_name }}-worker:
+  file.managed:
+    - source: salt://lagotto/conf/etc/cron.d/{{ app_name }}-worker
+    - template: jinja
+    - defaults:
+      container_name: {{ app_name }}-worker
