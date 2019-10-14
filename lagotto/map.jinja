@@ -2,7 +2,7 @@
 {% set environment = salt.grains.get('environment') %}
 {% set mysql_password = salt.pillar.get('secrets:lagotto:mysql:password') %}
 {% set mysql_host = consul_service_domain("alm-manager-sql", style='soma') %}
-{% set couch_host = salt.pillar.get('environment:' ~ environment ~ ':lagotto:couchdb_master', '127.0.0.1') %}
+{% set couch_host = consul_service_domain("alm-manager-nosql", style="soma") %}
 {% set redis_host = consul_service_domain("alm-manager-redis", style="soma") %}
 
 {% set props = salt['grains.filter_by'](
