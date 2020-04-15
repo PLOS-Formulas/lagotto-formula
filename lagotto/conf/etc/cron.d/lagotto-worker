@@ -1,0 +1,14 @@
+MAILTO=dev@plos.org
+SHELL=/bin/bash
+HOME=/home/root
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+5 * * * * root chronic docker exec {{ container_name }} rake cron:hourly
+
+20 1 * * * root chronic docker exec {{ container_name }} rake cron:daily
+
+40 1 * * 1 root chronic docker exec {{ container_name }} rake cron:weekly
+
+50 2 10 * * root chronic docker exec {{ container_name }} rake cron:monthly
+
+20 11,16 * * * root chronic docker exec -e FROM_PUB_DATE=`date --date="7 days ago" +\%Y-\%m-\%d` {{ container_name }} bundle exec rake cron:import --silent
