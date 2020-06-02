@@ -1,82 +1,112 @@
-{% from "consul/lib.sls" import consul_service_domain %}
-{% set environment = salt.grains.get('environment') %}
-{% set mysql_password = salt.pillar.get('secrets:lagotto:mysql:password') %}
-{% set mysql_host = consul_service_domain("alm-manager-sql", style='soma') %}
-{% set couch_host = consul_service_domain("alm-manager-nosql", style="soma") %}
-{% set redis_host = consul_service_domain("alm-manager-redis", style="soma") %}
+{% if salt.grains.has_value('subconfig') %}
+  {{ salt.grains.setval('env_complete', grains.get('environment') + '_' + grains.get('subconfig')) }}
+{% else %}
+  {{ salt.grains.set('env_complete', grains.get('environment')) }}
+{% endif %}
 
 {% set props = salt['grains.filter_by'](
 {
   'default':{
-    'admin_email': 'lagotto-qa@plos.org',
-    'api_key': salt.pillar.get('secrets:lagotto:rails-api-key'),
-    'app_port': 9292,
-    'app_root': '/var/www/lagotto',
-    'application': "lagotto",
-    'bugsnag_hostname': salt.grains.get('fqdn'),
-    'bugsnag_release_stage': environment,
-    'cas_prefix': '/cas',
-    'cas_url': 'https://nedcas-dev.plos.org',
-    'cited': 'scopus',
-    'concurrency': '25',
-    'couch_db_url': "http://{}:5984".format(couch_host),
-    'creator': "Public Library of Science",
-    'database_url': "mysql2://{}:{}@{}:{}/{}?pool=5&timeout=5000&encoding=utf8mb4".format("alm", mysql_password, mysql_host, 3306, "alm"),
-    'docker_image_name': "lagotto",
-    'docker_image_tag': "latest",
+
+    'app_name': "lagotto",
     'github_url': "git://github.com/PLOS/lagotto",
-    'import': '',
-    'log_level': 'debug',
-    'mail_address': 'localhost',
-    'mail_domain': 'localhost',
-    'mail_port': '25',
-    'memcache_servers': consul_service_domain("alm-manager-memcache", style="soma"),
-    'omniauth': 'cas',
-    'puma_threads': '16',
-    'puma_workers': '3',
-    'rails_env': 'production',
-    'redis_url': "redis://{}:6379/12".format(redis_host),
-    'secret_key_base': salt.pillar.get('secrets:lagotto:rails-secret'),
-    'sitename': 'ALM',
-    'sitenamelong': 'PLOS ALM',
-    'skip_ember': 1,
-    'solr_url': 'http://solr-mega-dev.soma.plos.org/solr/journals_dev/select',
+    'report_creator': "Public Library of Science",
+    'app_root': '/var/www/lagotto',
+    'deploy_stage': "production",
+    'deploy_user': "lagotto",
+    'deploy_group': "lagotto",
+    'version_ruby': '2.2.2',
+    'version_nodejs': '0.12.11-1nodesource1~trusty1',
     'sysctl_ip_local_port_range': "10000 65000",
     'sysctl_tcp_tw_recycle': '1',
     'sysctl_tcp_tw_reuse': '1',
-    'version_nodejs': '0.12.11-1nodesource1~trusty1',
-    'version_ruby': '2.2.2',
+
+    'memcache_server': '127.0.0.1',
+    'mysql_server': '127.0.0.1',
+    'redis_server': '127.0.0.1',
+    'sidekiq_server': '127.0.0.1',
+
+    'log_level': 'debug',
+    'rails_env': 'development',
+    'import_source': '',
+    'cited_source': 'scopus',
+    'solr_url': 'http://solr-mega-dev.soma.plos.org/solr/journals_dev/select',
+
+    'mysql_name': 'lagotto',
+    'mysql_port': '3306',
+    'mysql_username': 'lagotto',
+
+    'auth_provider': 'cas',
+    'auth_url': 'https://nedcas-dev.plos.org',
+    'auth_prefix': '/cas',
+
+    'site_short_name': 'ALM',
+    'site_long_name': 'PLOS ALM',
+
+    'email_address': 'localhost',
+    'email_port': '25',
+    'email_domain': 'localhost',
+    'email_admin': 'lagotto-qa@plos.org',
+
+    'sidekiq_concurrency': '25',
+
+    'puma_threads': '16',
+    'puma_workers': '3',
   },
   'vagrant': {
-    'docker_image_tag': "dev",
-    'sitename': 'ALM (Vagrant)',
+    'site_short_name': 'ALM (Vagrant)',
+
+    'memcache_server': 'lagotto.vagrant.local',
+    'mysql_server': 'lagotto.vagrant.local',
+    'redis_server': 'lagotto.vagrant.local',
+    'sidekiq_server': 'lagotto.vagrant.local',
   },
   'dev': {
-    'docker_image_tag': "dev",
     'log_level': 'debug',
-    'sitename': 'ALM (DEV)',
+    'site_short_name': 'ALM (DEV)',
+
+    'sidekiq_server': 'alm-dev1-backend1.soma.plos.org',
+  },
+  'qa': {
+    'log_level': 'info',
+    'site_short_name': 'ALM (QA)',
+    'auth_url': 'https://nedcas-qa.plos.org',
+
+    'sidekiq_server': 'lagotto-301.soma.plos.org',
   },
   'stage': {
-    'cas_url': 'https://nedcas-stage.plos.org',
-    'docker_image_tag': "stage",
-    'import': 'plos',
     'log_level': 'warn',
+    'rails_env': 'production',
+    'import_source': 'plos',
+    'site_short_name': 'ALM (STAGE)',
     'mysql_name': 'alm',
     'mysql_username': 'alm',
-    'sitename': 'ALM (STAGE)',
+    'auth_url': 'https://nedcas-stage.plos.org',
+
+    'memcache_server': 'alm-stage1-backend1.soma.plos.org',
+    'mysql_server': 'db-alm-401.soma.plos.org',
+    'redis_server': 'redis-alm-401.soma.plos.org',
+    'sidekiq_server': 'alm-stage1-backend1.soma.plos.org',
   },
   'prod': {
-    'admin_email': 'alm@plos.org',
-    'bugsnag_js_key': '8ee87325d4e0c9f462212b56f994ada4',
-    'bugsnag_key': 'd3504e878cdd6180e2af11eeb746041f',
-    'cas_url': 'https://register.plos.org',
-    'concurrency': '40',
-    'docker_image_tag': "prod",
-    'import': 'plos',
     'log_level': 'warn',
-    'mail_address': 'plos-org.mail.protection.outlook.com',
-    'mail_domain': 'alm.plos.org',
+    'rails_env': 'production',
+    'import_source': 'plos',
     'solr_url': 'http://solr-mega-prod.soma.plos.org/solr/journals_prod/select',
+    'mysql_name': 'alm',
+    'mysql_username': 'alm',
+    'auth_url': 'https://register.plos.org',
+    'email_address': 'plos-org.mail.protection.outlook.com',
+    'email_domain': 'alm.plos.org',
+    'email_admin': 'alm@plos.org',
+    'sidekiq_concurrency': '40',
+    'bugsnag_key': 'd3504e878cdd6180e2af11eeb746041f',
+    'bugsnag_js_key': '8ee87325d4e0c9f462212b56f994ada4',
+
+    'memcache_server': 'lagotto-101.soma.plos.org,lagotto-102.soma.plos.org',
+    'mysql_server': 'db-alm.soma.plos.org',
+    'redis_server': 'redis-alm-101.soma.plos.org',
+    'sidekiq_server': 'lagotto-101.soma.plos.org',
   }
 }
-, grain='environment', base='default') %}
+, grain='env_complete', base='default') %}
