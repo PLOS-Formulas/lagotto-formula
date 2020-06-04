@@ -55,9 +55,9 @@ include:
     - require:
       - {{ app_name }}-app-container-absent
       - {{ app_name }}-web-container-absent
-    - require_in:
-      - docker_volume: {{ app_name }}-assets-volume
     - name: {{ app_name }}-railsassets
+    - onlyif:
+      - docker inspect {{ app_name }}-railsassets > /dev/null
 
 {{ app_name }}-assets-volume:
   docker_volume.present:

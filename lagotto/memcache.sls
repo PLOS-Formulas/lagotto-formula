@@ -1,6 +1,6 @@
 {% from "consul/lib.sls" import consul_service_definition %}
 
-{{ consul_service_definition("alm-manager-memcache", port=11211, cluster="alm") }}
+{{ consul_service_definition("alm-manager-memcache", port=5984, cluster="alm") }}
 
 include:
   - memcache 
