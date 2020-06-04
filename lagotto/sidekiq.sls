@@ -1,26 +1,26 @@
-{% from "lagotto/map.jinja" import props with context %}
-{% from "lagotto/lib/docker-common.sls" import app_name, docker_dns, docker_image_name %}
+{% set distro = salt.grains.get('oscodename') %}
 
-include:
-  - lagotto.lib.docker-common
+# replace with Docker
+sidekiq:
+  service.running:
+    - watch:
+      {% if distro == 'trusty' %}
+      - file: /etc/init/sidekiq.conf
+      {% else %}
+      - file: /etc/systemd/system/sidekiq.service
+      {% endif %}
 
-{{ app_name }}-worker-container-absent:
-  docker_container.absent:
-    - onchanges:
-      - {{ app_name }}-image
-    - force: True
-    - names:
-      - {{app_name}}-worker
-
-{{ app_name }}-worker-container-running:
-  docker_container.running:
-    - name: {{ app_name }}-worker
-    - image: {{ docker_image_name }}
-    - environment:
-{%- for name, value in props.items() %}
-        {{ name|upper }}: {{ value }}
-{% endfor %}
-    - dns: {{ docker_dns }}
-    - require:
-      - {{ app_name }}-image
-    - command: bundle exec sidekiq
+{% if distro == 'trusty' %}
+/etc/init/sidekiq.conf:
+  file.managed:
+    - template: jinja
+    - source: salt://lagotto/etc/init/sidekiq.conf
+    - user: root
+    - group: root
+    - mode: 644
+{% else %}
+/etc/systemd/system/sidekiq.service:
+  file.managed:
+    - template: jinja
+    - source: salt://lagotto/etc/systemd/system/sidekiq.service
+{% endif %}

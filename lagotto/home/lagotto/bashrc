@@ -1,0 +1,7 @@
+{% from "lagotto/map.jinja" import props with context %}
+
+# this file is managed by salt local changes will be overwritten
+
+. /usr/share/chruby/chruby.sh
+. /usr/share/chruby/auto.sh
+chruby {{ props.get('version_ruby') }}
