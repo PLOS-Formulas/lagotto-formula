@@ -12,24 +12,24 @@ include:
 
 lagotto_db:
   mysql_database.present:
-    - name: alm
+    - name: lagotto
   mysql_user.present:
-    - name: 'alm'
+    - name: 'lagotto'
     - host: {{ mysql_ip }}
     - password: {{ pillar['secrets']['lagotto']['mysql']['password'] }}
   mysql_grants.present:
-    - database: alm.*
+    - database: lagotto.*
     - grant: ALL PRIVILEGES
-    - user: alm
+    - user: lagotto
     - host: {{ mysql_ip }}
 
 lagotto_localhost:
   mysql_user.present:
-    - name: 'alm'
+    - name: 'lagotto'
     - host: {{ docker_ip }}
     - password: {{ pillar['secrets']['lagotto']['mysql']['password'] }}
   mysql_grants.present:
-    - database: alm.*
+    - database: lagotto.*
     - grant: ALL PRIVILEGES
-    - user: alm
+    - user: lagotto
     - host: {{ docker_ip }}
