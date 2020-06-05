@@ -2,10 +2,11 @@
 #
 # CouchDB only supports binding to single or all interfaces (ie, not selective)
 # https://github.com/apache/couchdb/issues/1589
-
-{% from "consul/lib.sls" import consul_service_definition %}
-
-{% set couchdb_ini = '/opt/couchdb/etc/local.ini' %}
+{% if salt.grains.get('oscodename') == 'trusty' %}
+  {% set couchdb_ini = '/etc/couchdb/default.ini' %}
+{% else %}
+  {% set couchdb_ini = '/opt/couchdb/etc/local.ini' %}
+{% endif %}
 include:
   - couchdb 
 
@@ -13,6 +14,4 @@ extend:
   {{ couchdb_ini }}:
     file:
       - context:
-        b_address: 0.0.0.0
-
-{{ consul_service_definition("alm-manager-nosql", port=5984, cluster="alm") }}
+        b_address: 0.0.0.0 
