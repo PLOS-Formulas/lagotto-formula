@@ -20,10 +20,10 @@ lagotto_db:
 lagotto_localhost:
   mysql_user.present:
     - name: 'alm'
-    - host: {{ docker_ip }}
+    - host: 127.0.0.1
     - password: {{ pillar['secrets']['lagotto']['mysql']['password'] }}
   mysql_grants.present:
     - database: alm.*
     - grant: ALL PRIVILEGES
     - user: alm
-    - host: {{ docker_ip }}
+    - host: 127.0.0.1
