@@ -7,22 +7,8 @@
 {% set props = salt['grains.filter_by'](
 {
   'default':{
-    'admin_email': 'lagotto-qa@plos.org',
-    'api_key': salt.pillar.get('secrets:lagotto:rails-api-key'),
-    'app_port': 9292,
-    'app_root': '/var/www/lagotto',
-    'application': "lagotto",
-    'bugsnag_hostname': salt.grains.get('fqdn'),
-    'bugsnag_release_stage': environment,
-    'cas_prefix': '/cas',
-    'cas_url': 'https://nedcas-dev.plos.org',
-    'cited': 'scopus',
-    'concurrency': '25',
-    'couch_db_url': "http://{}:5984".format(couch_host),
-    'creator': "Public Library of Science",
-    'database_url': "mysql2://{}:{}@{}:{}/{}?pool=5&timeout=5000&encoding=utf8mb4".format("alm", mysql_password, mysql_host, 3306, "alm"),
-    'docker_image_name': "lagotto",
-    'docker_image_tag': "latest",
+
+    'app_name': "lagotto",
     'github_url': "git://github.com/PLOS/lagotto",
     'report_creator': "Public Library of Science",
     'app_root': '/var/www/lagotto',
@@ -89,9 +75,6 @@
     'sidekiq_server': 'lagotto-301.soma.plos.org',
   },
   'stage': {
-    'cas_url': 'https://nedcas-stage.plos.org',
-    'docker_image_tag': "stage",
-    'import': 'plos',
     'log_level': 'warn',
     'rails_env': 'production',
     'import_source': 'plos',
@@ -106,13 +89,6 @@
     'sidekiq_server': 'alm-stage1-backend1.soma.plos.org',
   },
   'prod': {
-    'admin_email': 'alm@plos.org',
-    'bugsnag_js_key': '8ee87325d4e0c9f462212b56f994ada4',
-    'bugsnag_key': 'd3504e878cdd6180e2af11eeb746041f',
-    'cas_url': 'https://register.plos.org',
-    'concurrency': '40',
-    'docker_image_tag': "prod",
-    'import': 'plos',
     'log_level': 'warn',
     'rails_env': 'production',
     'import_source': 'plos',
