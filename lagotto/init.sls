@@ -42,7 +42,7 @@ lagotto-apt-packages:
     - pkgs:
         - build-essential
         - libgmp-dev
-        - libmysqlclient-dev
+        - libmysqlclient-dev:5.7.21-1ubuntu1
         - libssl-dev
         - nodejs
         {% if oscodename == 'bionic' %}
