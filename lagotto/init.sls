@@ -42,13 +42,12 @@ lagotto-apt-packages:
     - pkgs:
         - build-essential
         - libgmp-dev
-        - libmysqlclient-dev: 5.7.21-1ubuntu1
+        - libmysqlclient-dev
         - libssl-dev
-        - nodejs
+        - nodejs: 8.10.0~dfsg-2ubuntu0.2
         {% if oscodename == 'bionic' %}
         - node-gyp
-        - nodejs-dev
-        - libssl1.0-dev
+        - nodejs-dev: 8.10.0~dfsg-2ubuntu0.2
         - npm
         {% endif %}
 
